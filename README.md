@@ -16,7 +16,7 @@ This is a simple web application using Flask that allows the user to track how m
 ## Installation
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/your-project-name.
+   git clone https://github.com/misterash/chickens
    cd your-project-name
     ```
 2. Install the required packages:
