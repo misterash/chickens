@@ -1,0 +1,152 @@
+:root {
+    --primary-color: #2196F3;
+    --secondary-color: #424242;
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --card-background: #fff;
+    --nav-background: #2196F3;
+    --nav-text-color: #fff;
+}
+
+body.dark-mode {
+    --primary-color: #90caf9;
+    --secondary-color: #bdbdbd;
+    --background-color: #303030;
+    --text-color: #f5f5f5;
+    --card-background: #424242;
+    --nav-background: #212121;
+    --nav-text-color: #f5f5f5;
+}
+
+body {
+    background-color: var(--background-color) !important;
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav {
+    background-color: var(--nav-background);
+}
+
+.nav-wrapper .brand-logo, .nav-wrapper a {
+    color: var(--nav-text-color);
+}
+
+.card-panel {
+    background-color: var(--card-background);
+    color: var(--text-color);
+}
+
+#summary h2 {
+    color: var(--text-color);
+}
+
+/* Materialize datepicker overrides for dark mode */
+.datepicker-modal {
+    background-color: var(--card-background);
+}
+
+.datepicker-date-display {
+    background-color: var(--primary-color);
+}
+
+.datepicker-table th, .datepicker-table td {
+    color: var(--text-color);
+}
+
+.datepicker-day-button:focus {
+    background-color: rgba(33, 150, 243, 0.2);
+}
+
+.is-today {
+    color: var(--primary-color) !important;
+}
+
+.is-selected {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+.datepicker-done, .datepicker-cancel {
+    color: var(--primary-color);
+}
+
+.input-field label {
+    color: var(--text-color);
+}
+
+.input-field input[type=text]:focus + label {
+    color: var(--primary-color);
+}
+
+.input-field input[type=text]:focus {
+    border-bottom: 1px solid var(--primary-color);
+    box-shadow: 0 1px 0 0 var(--primary-color);
+}
+
+.input-field input[type=text].valid {
+    border-bottom: 1px solid var(--primary-color);
+    box-shadow: 0 1px 0 0 var(--primary-color);
+}
+
+.striped>tbody>tr:nth-child(odd) {
+    background-color: rgba(242, 242, 242, 0.5);
+}
+
+body.dark-mode .striped>tbody>tr:nth-child(odd) {
+    background-color: rgba(66, 66, 66, 0.5);
+}
+
+table, th, td {
+    color: var(--text-color);
+}
+
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #90caf9;
+}
+.switch label input[type=checkbox]:checked+.lever:after {
+    background-color: #2196F3;
+}
+
+/* Custom egg toggle switch */
+.switch label .lever {
+    width: 40px;
+    height: 30px;
+    border-radius: 50% / 60% 60% 40% 40%;
+    background-color: #f5f5f5; /* Light grey for 'no egg' */
+    border: 1px solid #ccc;
+    margin: 0 10px;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.switch label .lever:after {
+    display: none; /* Hide the default circle */
+}
+
+.switch label input[type=checkbox]:checked + .lever {
+    background-color: #fffacd; /* Light yellow for 'egg laid' */
+    border-color: #fbc02d;
+    box-shadow: 0 0 5px #fbc02d;
+}
+
+/* We need to adjust the position of the lever to keep it centered */
+.switch label input[type=checkbox] {
+    left: -9999px; /* Keep it off-screen */
+}
+
+.switch {
+    height: 30px; /* Match the lever height */
+    display: flex;
+    align-items: center;
+}
+
+.switch label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Ensure html and body have the correct background in dark mode */
+html.dark-mode, body.dark-mode {
+    background-color: var(--background-color) !important;
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken Egg Tracker</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="">
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Chicken Egg Tracker</a>
+            <ul id="nav-mobile" class="right">
+                <li>
+                    <div class="switch">
+                        <label>
+                            Light
+                            <input type="checkbox" id="theme-switcher">
+                            <span class="lever"></span>
+                            Dark
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m6 offset-m3">
+                <div class="card-panel">
+                    <div class="input-field">
+                        <input type="text" class="datepicker" id="date-picker" value="{{ today }}">
+                        <label for="date-picker">Select Date</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chickens" class="row">
+        </div>
+
+        <hr>
+
+        <div id="summary" class="card-panel">
+            <h2 class="center-align">Egg Totals</h2>
+            <div class="row">
+                <div class="input-field col s12 m6">
+                    <input type="text" class="datepicker" id="start-date">
+                    <label for="start-date">Start Date</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <input type="text" class="datepicker" id="end-date">
+                    <label for="end-date">End Date</label>
+                </div>
+            </div>
+            <table id="summary-table" class="striped responsive-table">
+                <thead>
+                    <tr>
+                        <th>Chicken</th>
+                        <th>Total Eggs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        window.egg_data = {{ egg_data | tojson }};
+    </script>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
+
