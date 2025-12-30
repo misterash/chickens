@@ -1,6 +1,6 @@
 # Chicken Egg Counter
 
-This is a simple web application written in Python that allows the user to track how many eggs each chicken has laid on each day.
+This is a simple web application using Flask that allows the user to track how many eggs each chicken has laid on each day.
 
 ## Features
 
