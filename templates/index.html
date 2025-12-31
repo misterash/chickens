@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken Egg Tracker</title>
+    <title>Egg Tracker</title>
     <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Google Fonts -->
@@ -14,7 +14,7 @@
 
     <nav>
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo center">Chicken Egg Tracker</a>
+            <a href="#" class="brand-logo center">Egg Tracker</a>
             <ul id="nav-mobile" class="right">
                 <li>
                     <div class="switch">
@@ -79,6 +79,18 @@
     <!-- Materialize JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+    <!-- Confirmation Modal Structure -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h4>Confirm Deletion</h4>
+            <p>Are you sure you want to delete this chicken? This action cannot be undone and all associated egg data will be removed.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <a href="#!" id="confirmDeleteBtn" class="modal-close waves-effect waves-red btn-flat">Delete</a>
+        </div>
+    </div>
 </body>
 </html>
 

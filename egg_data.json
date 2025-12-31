@@ -1,8 +1,8 @@
 {
     "2025-12-30": {
-        "Larry": false,
-        "Iggy": false,
-        "Salt": false,
+        "Larry": true,
+        "Iggy": true,
+        "Salt": true,
         "Peppa": true,
         "Curly": true
     },
@@ -249,5 +249,12 @@
         "Curly": true,
         "Salt": true,
         "Peppa": true
-    }
+    },
+    "chickens": [
+        "Larry",
+        "Iggy",
+        "Curly",
+        "Salt",
+        "Peppa"
+    ]
 }
