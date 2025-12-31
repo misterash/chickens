@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 :root {
     --primary-color: #2196F3;
     --secondary-color: #424242;
@@ -7,7 +10,9 @@
     --nav-background: #2196F3;
     --nav-text-color: #fff;
 }
-
+#summary-table tbody td:nth-child(2) {
+    font-family: 'Roboto', sans-serif;
+}
 body.dark-mode {
     --primary-color: #90caf9;
     --secondary-color: #bdbdbd;
@@ -19,6 +24,8 @@ body.dark-mode {
 }
 
 body {
+    font-family: "Shadows Into Light", cursive; /* Apply the new font */
+    font-size: 20px;
     background-color: var(--background-color) !important;
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
@@ -64,7 +71,7 @@ nav {
 
 .is-selected {
     background-color: var(--primary-color) !important;
-    color: white !important;
+    color: var(--text-color) !important;
 }
 
 .datepicker-done, .datepicker-cancel {
@@ -144,9 +151,32 @@ table, th, td {
     display: flex;
     align-items: center;
     cursor: pointer;
+    font-size: 16px;
 }
 
-/* Ensure html and body have the correct background in dark mode */
-html.dark-mode, body.dark-mode {
-    background-color: var(--background-color) !important;
+body.dark-mode .modal {
+    background-color: var(--card-background); /* Use card background for modal */
+    color: var(--text-color); /* Use general text color */
+}
+
+body.dark-mode .modal .modal-content h4,
+body.dark-mode .modal .modal-content p {
+    color: var(--text-color);
+}
+
+body.dark-mode .modal .modal-footer {
+    background-color: var(--card-background); /* Match modal body */
+    border-top: 1px solid var(--secondary-color); /* Subtle border */
+}
+
+/* Adjust button colors for dark mode if needed, Materialize buttons might inherit already */
+body.dark-mode .modal-footer .btn-flat {
+    color: var(--primary-color); /* Use primary color for action buttons */
+}
+
+/* Additional styles for better dark mode experience */
+body.dark-mode .input-field input[type=text] {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif; /* Ensure font consistency */
 }
