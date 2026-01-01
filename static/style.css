@@ -2,12 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 :root {
-    --primary-color: #2196F3;
+    --primary-color: #22865d;
     --secondary-color: #424242;
     --background-color: #f4f4f4;
-    --text-color: #333;
+    --text-color: #000000;
     --card-background: #fff;
-    --nav-background: #2196F3;
+    --nav-background: #22865d;
     --nav-text-color: #fff;
 }
 #summary-table tbody td:nth-child(2) {
@@ -131,8 +131,8 @@ table, th, td {
 }
 
 .switch label input[type=checkbox]:checked + .lever {
-    background-color: #fffacd; /* Light yellow for 'egg laid' */
-    border-color: #fbc02d;
+    background-color: #ec9b3d; /* Light yellow for 'egg laid' */
+    border-color: #d1b493;
     box-shadow: 0 0 5px #fbc02d;
 }
 

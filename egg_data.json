@@ -250,6 +250,16 @@
         "Salt": true,
         "Peppa": true
     },
+    "2025-12-31": {
+        "Peppa": true,
+        "Curly": true
+    },
+    "2026-01-01": {
+        "Larry": true,
+        "Iggy": true,
+        "Salt": true,
+        "Peppa": true
+    },
     "chickens": [
         "Larry",
         "Iggy",
