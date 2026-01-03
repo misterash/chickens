@@ -3,7 +3,6 @@ from datetime import datetime
 import pytz
 import os
 import json
-import ssl
 
 app = Flask(__name__)
 
@@ -80,9 +79,6 @@ def add_chicken():
 
     return jsonify(success=True, chickens=chickens_list)
 
-
-    return jsonify(success=True, chickens=chickens_list)
-
 @app.route('/remove_chicken', methods=['POST'])
 def remove_chicken():
     global chickens_list
@@ -115,5 +111,3 @@ if __name__ == '__main__':
         app.run(port=5000)
     except Exception as e:
         print(f"Error starting server: {e}")
-
-
