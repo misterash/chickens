@@ -7,7 +7,7 @@ A simple Flask-based web application for tracking egg production of individual c
 - **Purpose**: To allow users to record and view egg counts for each chicken on a daily basis.
 - **Backend**: Python with the [Flask](https://flask.palletsprojects.com/) web framework.
 - **Frontend**: HTML/JavaScript using [Materialize CSS](https://materializecss.com/) for a modern, responsive UI.
-- **Persistence**: Data is stored locally in `egg_data.json`. No external database is required.
+- **Persistence**: Data is stored locally in `eggs.db` using SQLite.
 - **Key Features**:
     - Add and remove chickens.
     - Toggle egg production for each chicken per date.
@@ -17,10 +17,10 @@ A simple Flask-based web application for tracking egg production of individual c
 ## Project Structure
 
 - `app.py`: The main Flask application containing API routes and data management logic.
-- `egg_data.json`: The local data store (JSON format).
+- `eggs.db`: The SQLite database file.
 - `static/`: Contains static assets like `app.js` and `style.css`.
 - `templates/`: Contains the Jinja2 HTML templates (e.g., `index.html`).
-- `requirements.txt`: Python dependencies.
+- `pyproject.toml`: Project configuration and dependencies (managed by [uv](https://docs.astral.sh/uv/)).
 - `Dockerfile`: Configuration for containerizing the application.
 
 ## Building and Running
@@ -29,12 +29,12 @@ A simple Flask-based web application for tracking egg production of individual c
 
 1. **Install Dependencies**:
    ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
 2. **Run the Application**:
    ```bash
-   python app.py
+   uv run app.py
    ```
    The app will be available at `http://localhost:5000`.
 
@@ -52,7 +52,7 @@ A simple Flask-based web application for tracking egg production of individual c
 
 ## Development Conventions
 
-- **Data Management**: The application loads the entire `egg_data.json` into memory on startup. Updates are written back to the file synchronously.
+- **Data Management**: The application uses SQLite (`eggs.db`) for persistent storage. Data is queried and updated via SQL, ensuring consistency and enabling concurrent access.
 - **API Endpoints**:
     - `GET /`: Serves the main application.
     - `POST /update`: Updates egg data for a specific date and chicken.
