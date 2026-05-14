@@ -1,14 +1,19 @@
 # Use an official Python runtime as a parent image
 FROM python:3.9-slim-buster
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Install any needed packages specified in requirements.txt
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
 
-# Copy the rest of the application code into the container at /app
+# Install dependencies using uv
+RUN uv sync --frozen --no-dev
+
+# Copy the rest of the application code
 COPY . .
 
 # Expose the port that the Flask app runs on
@@ -19,4 +24,5 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the application
-CMD ["flask", "run"]
+# Use uv run to ensure the virtualenv is used
+CMD ["uv", "run", "flask", "run"]

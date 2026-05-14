@@ -2,108 +2,183 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 import pytz
 import os
-import json
+import sqlite3
 
 app = Flask(__name__)
 
-# Path to the data file
-DATA_FILE = 'egg_data.json'
+DB_FILE = 'eggs.db'
 
-# Function to load data from the JSON file
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        # Initialize with default chickens if file does not exist
-        return {'chickens': ['Larry', 'Iggy', 'Curly', 'Salt', 'Peppa']}
-    with open(DATA_FILE, 'r') as f:
-        data = json.load(f)
-        if 'chickens' not in data:
-            data['chickens'] = ['Larry', 'Iggy', 'Curly', 'Salt', 'Peppa']
-        return data
+def get_db_connection():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA foreign_keys = ON')
+    return conn
 
-# Function to save data to the JSON file
-def save_data(data_to_save):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data_to_save, f, indent=4)
+def init_db():
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS chickens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL
+        )
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS egg_production (
+            date TEXT NOT NULL,
+            chicken_id INTEGER NOT NULL,
+            laid BOOLEAN NOT NULL,
+            PRIMARY KEY (date, chicken_id),
+            FOREIGN KEY (chicken_id) REFERENCES chickens (id) ON DELETE CASCADE
+        )
+    ''')
+    # Default chickens if table is empty
+    cursor = conn.cursor()
+    cursor.execute('SELECT COUNT(*) FROM chickens')
+    if cursor.fetchone()[0] == 0:
+        default_chickens = ['Larry', 'Iggy', 'Curly', 'Salt']
+        for name in default_chickens:
+            cursor.execute('INSERT INTO chickens (name) VALUES (?)', (name,))
+    conn.commit()
+    conn.close()
 
-# Initialize data
-full_data = load_data()
-egg_data = {date: eggs for date, eggs in full_data.items() if date != 'chickens'}
-chickens_list = full_data.get('chickens', [])
+init_db()
 
 @app.route('/')
 def index():
     la_tz = pytz.timezone('America/Los_Angeles')
     today = datetime.now(la_tz).strftime('%Y-%m-%d')
+    
+    conn = get_db_connection()
+    # Fetch all egg data and structure it as {date: {chicken_name: laid}}
+    production = conn.execute('''
+        SELECT ep.date, c.name as chicken_name, ep.laid
+        FROM egg_production ep
+        JOIN chickens c ON ep.chicken_id = c.id
+    ''').fetchall()
+    
+    egg_data = {}
+    for row in production:
+        date = row['date']
+        if date not in egg_data:
+            egg_data[date] = {}
+        egg_data[date][row['chicken_name']] = bool(row['laid'])
+    
+    conn.close()
     return render_template('index.html', today=today, egg_data=egg_data)
 
 @app.route('/update', methods=['POST'])
 def update():
     data = request.get_json()
     date = data.get('date')
-    chicken = data.get('chicken')
+    chicken_name = data.get('chicken')
     laid_egg = data.get('laid_egg')
 
-    if date not in egg_data:
-        egg_data[date] = {}
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get chicken id
+    cursor.execute('SELECT id FROM chickens WHERE name = ?', (chicken_name,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return jsonify(success=False, message="Chicken not found")
+    
+    chicken_id = row[0]
+    
+    # Update or insert egg production
+    cursor.execute('''
+        INSERT INTO egg_production (date, chicken_id, laid)
+        VALUES (?, ?, ?)
+        ON CONFLICT(date, chicken_id) DO UPDATE SET laid=excluded.laid
+    ''', (date, chicken_id, laid_egg))
+    
+    conn.commit()
+    
+    # Fetch updated data for return
+    production = conn.execute('''
+        SELECT ep.date, c.name as chicken_name, ep.laid
+        FROM egg_production ep
+        JOIN chickens c ON ep.chicken_id = c.id
+    ''').fetchall()
+    
+    egg_data = {}
+    for r in production:
+        d = r['date']
+        if d not in egg_data:
+            egg_data[d] = {}
+        egg_data[d][r['chicken_name']] = bool(r['laid'])
+        
+    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens').fetchall()]
+    conn.close()
 
-    egg_data[date][chicken] = laid_egg
-
-    data_to_save = egg_data.copy()
-    data_to_save['chickens'] = chickens_list
-    save_data(data_to_save)
-
-    return jsonify(success=True, egg_data=egg_data, chickens=chickens_list)
+    return jsonify(success=True, egg_data=egg_data, chickens=chickens)
 
 @app.route('/data')
 def get_data():
-    return jsonify(load_data())
+    conn = get_db_connection()
+    
+    production = conn.execute('''
+        SELECT ep.date, c.name as chicken_name, ep.laid
+        FROM egg_production ep
+        JOIN chickens c ON ep.chicken_id = c.id
+    ''').fetchall()
+    
+    egg_data = {}
+    for row in production:
+        date = row['date']
+        if date not in egg_data:
+            egg_data[date] = {}
+        egg_data[date][row['chicken_name']] = bool(row['laid'])
+        
+    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens').fetchall()]
+    conn.close()
+    
+    # Maintain same format as JSON
+    full_data = egg_data
+    full_data['chickens'] = chickens
+    return jsonify(full_data)
 
 @app.route('/get_chickens')
 def get_chickens():
-    return jsonify(success=True, chickens=chickens_list)
+    conn = get_db_connection()
+    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens').fetchall()]
+    conn.close()
+    return jsonify(success=True, chickens=chickens)
 
 @app.route('/add_chicken', methods=['POST'])
 def add_chicken():
-    global chickens_list
-    global full_data
-
     chicken_name = request.json.get('chicken_name')
-    if not chicken_name or chicken_name in chickens_list:
-        return jsonify(success=False, message='Chicken name cannot be empty or already exists.')
+    if not chicken_name:
+        return jsonify(success=False, message='Chicken name cannot be empty.')
 
-    chickens_list.append(chicken_name)
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO chickens (name) VALUES (?)', (chicken_name,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify(success=False, message='Chicken already exists.')
     
-    full_data = egg_data.copy()
-    full_data['chickens'] = chickens_list
-    save_data(full_data)
+    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens').fetchall()]
+    conn.close()
 
-    return jsonify(success=True, chickens=chickens_list)
+    return jsonify(success=True, chickens=chickens)
 
 @app.route('/remove_chicken', methods=['POST'])
 def remove_chicken():
-    global chickens_list
-    global egg_data
-    global full_data
-
     chicken_name = request.json.get('chicken_name')
-    if not chicken_name or chicken_name not in chickens_list:
-        return jsonify(success=False, message='Chicken not found.')
+    if not chicken_name:
+        return jsonify(success=False, message='Chicken name required.')
 
-    chickens_list.remove(chicken_name)
+    conn = get_db_connection()
+    conn.execute('DELETE FROM chickens WHERE name = ?', (chicken_name,))
+    # egg_production entries are deleted automatically due to ON DELETE CASCADE
+    conn.commit()
+    
+    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens').fetchall()]
+    conn.close()
 
-    # Remove chicken's egg data from all dates
-    for date in list(egg_data.keys()):
-        if chicken_name in egg_data[date]:
-            del egg_data[date][chicken_name]
-        # If a date has no more egg entries, remove the date
-        if not egg_data[date]:
-            del egg_data[date]
-
-    full_data = egg_data.copy()
-    full_data['chickens'] = chickens_list
-    save_data(full_data)
-
-    return jsonify(success=True, chickens=chickens_list)
+    return jsonify(success=True, chickens=chickens)
 
 
 if __name__ == '__main__':
