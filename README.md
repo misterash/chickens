@@ -50,4 +50,4 @@ Want to run it in a container? No problem! 📦
    docker run -p 5000:5000 chicken-egg-counter:latest
    ```
 
-Happy egg counting! 🍳🍗
+Happy egg counting! 🍳
