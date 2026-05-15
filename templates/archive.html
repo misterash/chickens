@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flock Archive - Egg Tracker</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="/" class="brand-logo center">Flock Archive</a>
+            <ul id="nav-mobile" class="left">
+                <li><a href="/"><i class="material-icons left">arrow_back</i>Tracker</a></li>
+            </ul>
+            <ul class="right">
+                <li>
+                    <div class="switch">
+                        <label>
+                            Light
+                            <input type="checkbox" id="theme-switcher">
+                            <span class="lever"></span>
+                            Dark
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row" style="margin-top: 20px;">
+            <div class="col s12">
+                <div class="card-panel">
+                    <h2 class="center-align">Lifetime Statistics 🥚</h2>
+                    <table id="archive-table" class="striped responsive-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Arrival Date</th>
+                                <th>Departure Date</th>
+                                <th>Lifetime Eggs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-body">
+                            <!-- Data will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Dates Modal -->
+    <div id="editDatesModal" class="modal">
+        <div class="modal-content">
+            <h4>Edit Dates for <span id="modalChickenName"></span></h4>
+            <div class="row">
+                <div class="input-field col s12 m6">
+                    <input type="text" class="datepicker" id="editArrivalDate">
+                    <label for="editArrivalDate">Arrival Date</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <input type="text" class="datepicker" id="editDeactivationDate">
+                    <label for="editDeactivationDate">Departure Date</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+            <a href="#!" id="saveDatesBtn" class="waves-effect waves-blue btn blue white-text">Save Changes</a>
+        </div>
+    </div>
+
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="{{ url_for('static', filename='archive.js') }}"></script>
+    <script>
+        // Shared theme logic
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const body = document.body;
+        themeSwitcher.addEventListener('change', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            themeSwitcher.checked = true;
+        }
+    </script>
+</body>
+</html>

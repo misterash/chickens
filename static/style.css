@@ -10,7 +10,10 @@
     --nav-background: #22865d;
     --nav-text-color: #fff;
 }
-#summary-table tbody td:nth-child(2) {
+#summary-table tbody td:nth-child(2),
+#archive-table tbody td:nth-child(3),
+#archive-table tbody td:nth-child(4),
+#archive-table tbody td:nth-child(5) {
     font-family: 'Roboto', sans-serif;
 }
 body.dark-mode {
@@ -179,4 +182,13 @@ body.dark-mode .input-field input[type=text] {
     background-color: var(--card-background);
     color: var(--text-color);
     font-family: 'Roboto', sans-serif; /* Ensure font consistency */
+}
+/* Fix for datepicker modal in archive page */
+#editDatesModal {
+    min-height: 450px;
+    overflow-y: visible;
+}
+
+#editDatesModal .modal-content {
+    overflow-y: visible;
 }
