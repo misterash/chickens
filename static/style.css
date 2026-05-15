@@ -192,3 +192,42 @@ body.dark-mode .input-field input[type=text] {
 #editDatesModal .modal-content {
     overflow-y: visible;
 }
+
+/* Mobile Optimization for Archive Table */
+@media only screen and (max-width: 600px) {
+    #archive-table {
+        font-size: 14px;
+    }
+    
+    #archive-table th, #archive-table td {
+        padding: 8px 4px;
+    }
+
+    #archive-table .badge {
+        font-size: 10px;
+        min-width: 45px;
+    }
+
+    /* Hide redundant text on mobile to save space */
+    #archive-table th:nth-child(2),
+    #archive-table td:nth-child(2) {
+        display: none;
+    }
+
+    .container {
+        width: 95%;
+    }
+
+    .card-panel {
+        padding: 10px;
+    }
+}
+
+/* Discrete Edit Button */
+.edit-btn i {
+    transition: color 0.2s;
+}
+
+.edit-btn:hover i {
+    color: var(--primary-color) !important;
+}

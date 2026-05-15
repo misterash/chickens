@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             '<td>' + chicken.arrival_date + '</td>' +
                             '<td>' + chicken.deactivation_date + '</td>' +
                             '<td>' + chicken.lifetime_eggs + '</td>' +
-                            '<td><a class="btn-small blue waves-effect edit-btn" data-name="' + chicken.name + '" data-arrival="' + chicken.arrival_date + '" data-deactivation="' + chicken.deactivation_date + '"><i class="material-icons">edit</i></a></td>';
+                            '<td><a class="btn-flat btn-small edit-btn" data-name="' + chicken.name + '" data-arrival="' + chicken.arrival_date + '" data-deactivation="' + chicken.deactivation_date + '" style="padding: 0;"><i class="material-icons grey-text" style="font-size: 1.2rem;">edit</i></a></td>';
             archiveBody.appendChild(row);
         });
 
