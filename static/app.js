@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const datepickers = M.Datepicker.init(document.querySelectorAll('.datepicker'), {
         format: 'yyyy-mm-dd',
         autoClose: true,
+        container: document.body, // Ensure datepicker modal isn't clipped
         onSelect: function() {
             if (this.el.id === 'start-date' || this.el.id === 'end-date') {
                 renderSummary();
@@ -53,7 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const input = chickenCard.querySelector('input');
             input.addEventListener('change', function() {
                 const laid_egg = this.checked;
-                const date = M.Datepicker.getInstance(document.getElementById('date-picker')).el.value;
+                const dateInput = document.getElementById('date-picker');
+                const date = dateInput.value;
                 updateEggData(date, chickenName, laid_egg);
                 renderSummary();
             });
@@ -136,8 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 allChickens = data.chickens;
                 renderChickenCards(allChickens);
-                const mainDatePicker = M.Datepicker.getInstance(document.getElementById('date-picker'));
-                const serverToday = mainDatePicker.el.value;
+                const dateInput = document.getElementById('date-picker');
+                const serverToday = dateInput.value;
                 setDefaultDates(serverToday);
                 renderChickens(serverToday);
                 renderSummary();
