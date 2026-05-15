@@ -1,233 +1,308 @@
-@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&family=Playfair+Display:wght@700&family=Quicksand:wght@400;500;600&family=Roboto:wght@400;700&display=swap');
 
 :root {
-    --primary-color: #22865d;
-    --secondary-color: #424242;
-    --background-color: #f4f4f4;
-    --text-color: #000000;
-    --card-background: #fff;
-    --nav-background: #22865d;
-    --nav-text-color: #fff;
+    /* Modern Farm Palette */
+    --meadow-green: #4b6f44;
+    --eggshell-cream: #fdf8f0;
+    --terracotta: #c0504d;
+    --sunny-yellow: #f3c137;
+    --deep-brown: #3e2723;
+    --soft-shadow: 0 8px 30px rgba(0,0,0,0.05);
+    
+    --primary-color: var(--meadow-green);
+    --secondary-color: var(--terracotta);
+    --background-color: var(--eggshell-cream);
+    --text-color: var(--deep-brown);
+    --card-background: #ffffff;
+    --nav-background: var(--meadow-green);
+    --nav-text-color: #ffffff;
+    --accent-color: var(--sunny-yellow);
 }
-#summary-table tbody td:nth-child(2),
-#archive-table tbody td:nth-child(3),
-#archive-table tbody td:nth-child(4),
-#archive-table tbody td:nth-child(5) {
-    font-family: 'Roboto', sans-serif;
-}
+
 body.dark-mode {
-    --primary-color: #90caf9;
-    --secondary-color: #bdbdbd;
-    --background-color: #303030;
-    --text-color: #f5f5f5;
-    --card-background: #424242;
-    --nav-background: #212121;
-    --nav-text-color: #f5f5f5;
+    --primary-color: #81c784;
+    --secondary-color: #e57373;
+    --background-color: #1a2421;
+    --text-color: #e0e0e0;
+    --card-background: #1e2a27;
+    --nav-background: #111816;
+    --nav-text-color: #ffffff;
 }
 
 body {
-    font-family: "Shadows Into Light", cursive; /* Apply the new font */
-    font-size: 20px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 22px;
     background-color: var(--background-color) !important;
     color: var(--text-color);
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    line-height: 1.4;
+}
+
+h1, h2, h3, h4, .brand-logo {
+    font-family: "Shadows Into Light", cursive;
+    font-weight: 700;
 }
 
 nav {
     background-color: var(--nav-background);
+    box-shadow: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.nav-wrapper .brand-logo, .nav-wrapper a {
-    color: var(--nav-text-color);
+.nav-wrapper .brand-logo {
+    font-size: 2.2rem;
+}
+
+.container {
+    margin-top: 30px;
 }
 
 .card-panel {
     background-color: var(--card-background);
     color: var(--text-color);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow) !important;
+    border: 1px solid rgba(0,0,0,0.02);
+    padding: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-#summary h2 {
-    color: var(--text-color);
+.card-panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1) !important;
 }
 
-/* Materialize datepicker overrides for dark mode */
+/* Datepicker Styling */
 .datepicker-modal {
-    background-color: var(--card-background);
+    border-radius: 20px;
+    overflow: hidden;
 }
 
 .datepicker-date-display {
     background-color: var(--primary-color);
 }
 
-.datepicker-table th, .datepicker-table td {
-    color: var(--text-color);
-}
-
 .datepicker-day-button:focus {
-    background-color: rgba(33, 150, 243, 0.2);
-}
-
-.is-today {
-    color: var(--primary-color) !important;
+    background-color: rgba(75, 111, 68, 0.2);
 }
 
 .is-selected {
     background-color: var(--primary-color) !important;
-    color: var(--text-color) !important;
 }
 
-.datepicker-done, .datepicker-cancel {
-    color: var(--primary-color);
+/* Buttons */
+.btn, .btn-large, .btn-small {
+    background-color: var(--primary-color);
+    border-radius: 12px;
+    text-transform: none;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(75, 111, 68, 0.3);
 }
 
-.input-field label {
+.btn:hover {
+    background-color: #3d5a37;
+}
+
+.btn.blue {
+    background-color: #4a90e2 !important;
+}
+
+/* Custom Egg Toggle Switch */
+.switch label {
+    font-weight: 500;
     color: var(--text-color);
+    font-size: 1.2rem;
 }
 
-.input-field input[type=text]:focus + label {
-    color: var(--primary-color);
-}
-
-.input-field input[type=text]:focus {
-    border-bottom: 1px solid var(--primary-color);
-    box-shadow: 0 1px 0 0 var(--primary-color);
-}
-
-.input-field input[type=text].valid {
-    border-bottom: 1px solid var(--primary-color);
-    box-shadow: 0 1px 0 0 var(--primary-color);
-}
-
-.striped>tbody>tr:nth-child(odd) {
-    background-color: rgba(242, 242, 242, 0.5);
-}
-
-body.dark-mode .striped>tbody>tr:nth-child(odd) {
-    background-color: rgba(66, 66, 66, 0.5);
-}
-
-table, th, td {
-    color: var(--text-color);
-}
-
-.switch label input[type=checkbox]:checked+.lever {
-    background-color: #90caf9;
-}
-.switch label input[type=checkbox]:checked+.lever:after {
-    background-color: #2196F3;
-}
-
-/* Custom egg toggle switch */
 .switch label .lever {
-    width: 40px;
-    height: 30px;
-    border-radius: 50% / 60% 60% 40% 40%;
-    background-color: #f5f5f5; /* Light grey for 'no egg' */
-    border: 1px solid #ccc;
-    margin: 0 10px;
-    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    width: 50px;
+    height: 28px;
+    background-color: #eee;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    margin: 0 12px;
+    position: relative;
+    transition: all 0.3s ease;
 }
 
 .switch label .lever:after {
-    display: none; /* Hide the default circle */
+    content: '🥚';
+    font-size: 18px;
+    top: -2px;
+    left: -2px;
+    background-color: transparent;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .switch label input[type=checkbox]:checked + .lever {
-    background-color: #ec9b3d; /* Light yellow for 'egg laid' */
-    border-color: #d1b493;
-    box-shadow: 0 0 5px #fbc02d;
+    background-color: var(--sunny-yellow);
+    border-color: #f1b505;
 }
 
-/* We need to adjust the position of the lever to keep it centered */
-.switch label input[type=checkbox] {
-    left: -9999px; /* Keep it off-screen */
+.switch label input[type=checkbox]:checked + .lever:after {
+    background-color: transparent;
+    left: 24px;
+    content: '🍳';
 }
 
-.switch {
-    height: 30px; /* Match the lever height */
-    display: flex;
-    align-items: center;
+/* Tables */
+table.striped > tbody > tr:nth-child(odd) {
+    background-color: rgba(75, 111, 68, 0.03);
 }
 
-.switch label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-body.dark-mode .modal {
-    background-color: var(--card-background); /* Use card background for modal */
-    color: var(--text-color); /* Use general text color */
-}
-
-body.dark-mode .modal .modal-content h4,
-body.dark-mode .modal .modal-content p {
+table thead th {
     color: var(--text-color);
+    font-weight: 700;
+    border-bottom: 2px solid rgba(75, 111, 68, 0.1);
 }
 
-body.dark-mode .modal .modal-footer {
-    background-color: var(--card-background); /* Match modal body */
-    border-top: 1px solid var(--secondary-color); /* Subtle border */
+/* Roboto Font for Numbers and Lifespan */
+#summary-table tbody td:nth-child(2),
+#archive-table tbody td:nth-child(2),
+#archive-table tbody td:nth-child(3) {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
-/* Adjust button colors for dark mode if needed, Materialize buttons might inherit already */
-body.dark-mode .modal-footer .btn-flat {
-    color: var(--primary-color); /* Use primary color for action buttons */
+/* Badges */
+.badge {
+    border-radius: 8px !important;
+    font-weight: 600;
+    padding: 2px 8px !important;
 }
 
-/* Additional styles for better dark mode experience */
-body.dark-mode .input-field input[type=text] {
-    background-color: var(--card-background);
-    color: var(--text-color);
-    font-family: 'Roboto', sans-serif; /* Ensure font consistency */
+/* Modal Fixes */
+.modal {
+    border-radius: 24px;
+    max-height: 85%;
 }
-/* Fix for datepicker modal in archive page */
+
 #editDatesModal {
-    min-height: 450px;
+    min-height: 500px;
     overflow-y: visible;
 }
 
-#editDatesModal .modal-content {
-    overflow-y: visible;
-}
-
-/* Mobile Optimization for Archive Table */
+/* Mobile Adjustments */
 @media only screen and (max-width: 600px) {
-    #archive-table {
-        font-size: 14px;
-    }
-    
+    .brand-logo { font-size: 1.8rem !important; }
+    .card-panel { padding: 16px; border-radius: 16px; }
+    #archive-table { font-size: 14px; }
     #archive-table th, #archive-table td {
-        padding: 8px 4px;
-    }
-
-    #archive-table .badge {
-        font-size: 10px;
-        min-width: 45px;
-    }
-
-    /* Hide redundant text on mobile to save space */
-    #archive-table th:nth-child(2),
-    #archive-table td:nth-child(2) {
-        display: none;
-    }
-
-    .container {
-        width: 95%;
-    }
-
-    .card-panel {
-        padding: 10px;
+        padding: 12px 6px;
     }
 }
 
-/* Discrete Edit Button */
-.edit-btn i {
+/* Remove backgrounds from flat icon buttons */
+.btn-flat {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.delete-chicken-btn i, .edit-btn i {
     transition: color 0.2s;
 }
 
-.edit-btn:hover i {
+.delete-chicken-btn:hover i, .edit-btn:hover i {
     color: var(--primary-color) !important;
+}
+
+/* Force light text for inputs in dark mode */
+body.dark-mode input {
+    color: var(--text-color) !important;
+}
+
+body.dark-mode .input-field input[type=text]:focus {
+    color: var(--text-color) !important;
+}
+
+/* Refined Dark Mode Card Border */
+body.dark-mode .card-panel {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Comprehensive Dark Mode Modal & Datepicker Fixes */
+body.dark-mode .modal, 
+body.dark-mode .datepicker-modal,
+body.dark-mode .datepicker-calendar-container,
+body.dark-mode .datepicker-footer {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+}
+
+body.dark-mode .modal .modal-footer {
+    background-color: var(--card-background) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .datepicker-table th, 
+body.dark-mode .datepicker-table td,
+body.dark-mode .datepicker-day-button,
+body.dark-mode .datepicker-controls,
+body.dark-mode .datepicker-controls button {
+    color: var(--text-color) !important;
+}
+
+body.dark-mode .select-wrapper input.select-dropdown {
+    color: var(--text-color) !important;
+}
+
+body.dark-mode .datepicker-day-button:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .month-prev:before, 
+body.dark-mode .month-next:before {
+    border-color: var(--text-color) !important;
+}
+
+/* Improve Modal Button Visibility in Dark Mode */
+body.dark-mode .modal-footer .btn-flat {
+    color: var(--primary-color) !important;
+}
+
+body.dark-mode .modal-footer .btn {
+    box-shadow: none !important;
+}
+
+body.dark-mode #confirmDeleteBtn {
+    background-color: var(--secondary-color) !important;
+    color: #fff !important;
+}
+
+body.dark-mode #saveDatesBtn {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+/* Condensed Archive Table Styling */
+.status-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+.status-badge.green { background-color: var(--meadow-green); }
+.status-badge.grey { background-color: #9e9e9e; }
+
+.lifespan-cell {
+    white-space: nowrap;
+}
+
+@media only screen and (max-width: 600px) {
+    .lifespan-cell {
+        font-size: 1rem !important;
+    }
 }

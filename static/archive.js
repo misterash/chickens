@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const archiveBody = document.getElementById('archive-body');
     const editModal = M.Modal.init(document.getElementById('editDatesModal'), {
-        container: document.body // Renders the datepicker outside the modal container to prevent clipping
+        container: document.body
     });
     
     const datepickers = M.Datepicker.init(document.querySelectorAll('.datepicker'), {
         format: 'yyyy-mm-dd',
         autoClose: true,
-        container: document.body // This is the key fix to keep the calendar from being cut off
+        container: document.body
     });
 
     let currentChicken = null;
@@ -32,12 +32,22 @@ document.addEventListener('DOMContentLoaded', function() {
         archiveBody.innerHTML = '';
         chickens.forEach(chicken => {
             const row = document.createElement('tr');
-            row.innerHTML = '<td><strong>' + chicken.name + '</strong></td>' +
-                            '<td><span class="badge ' + (chicken.status === "Active" ? "green" : "grey") + ' white-text" style="float: none; margin-left: 0;">' + chicken.status + '</span></td>' +
-                            '<td>' + chicken.arrival_date + '</td>' +
-                            '<td>' + chicken.deactivation_date + '</td>' +
+            
+            const statusClass = chicken.status === "Active" ? "green" : "grey";
+            const endDate = chicken.status === "Active" ? "Present" : chicken.deactivation_date;
+            const lifespan = chicken.arrival_date + ' → ' + endDate;
+
+            row.innerHTML = '<td>' +
+                                '<div><strong>' + chicken.name + '</strong></div>' +
+                                '<span class="status-badge ' + statusClass + '">' + chicken.status + '</span>' +
+                            '</td>' +
+                            '<td class="lifespan-cell">' + lifespan + '</td>' +
                             '<td>' + chicken.lifetime_eggs + '</td>' +
-                            '<td><a class="btn-flat btn-small edit-btn" data-name="' + chicken.name + '" data-arrival="' + chicken.arrival_date + '" data-deactivation="' + chicken.deactivation_date + '" style="padding: 0;"><i class="material-icons grey-text" style="font-size: 1.2rem;">edit</i></a></td>';
+                            '<td class="right-align">' +
+                                '<a class="btn-flat btn-small edit-btn" data-name="' + chicken.name + '" data-arrival="' + chicken.arrival_date + '" data-deactivation="' + chicken.deactivation_date + '" style="padding: 0;">' +
+                                    '<i class="material-icons grey-text" style="font-size: 1.2rem;">edit</i>' +
+                                '</a>' +
+                            '</td>';
             archiveBody.appendChild(row);
         });
 
