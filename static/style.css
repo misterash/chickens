@@ -306,3 +306,15 @@ body.dark-mode #saveDatesBtn {
         font-size: 1rem !important;
     }
 }
+
+/* Fix mobile nav overlap */
+@media only screen and (max-width: 600px) {
+    .nav-wrapper .brand-logo.center {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .switch label {
+        margin-right: 10px;
+    }
+}
