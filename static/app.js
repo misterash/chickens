@@ -131,20 +131,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    function getLAToday() {
+        return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+    }
 
-    fetch('/get_chickens')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                allChickens = data.chickens;
+    function syncData() {
+        const dateInput = document.getElementById('date-picker');
+        if (!dateInput) return;
+        const laToday = getLAToday();
+
+        Promise.all([
+            fetch('/get_chickens').then(r => r.json()),
+            fetch('/data').then(r => r.json())
+        ])
+        .then(([chickensData, eggData]) => {
+            if (chickensData.success) {
+                allChickens = chickensData.chickens;
+                window.egg_data = eggData;
+                
                 renderChickenCards(allChickens);
-                const dateInput = document.getElementById('date-picker');
-                const serverToday = dateInput.value;
-                setDefaultDates(serverToday);
-                renderChickens(serverToday);
+                
+                const datePickerInstance = M.Datepicker.getInstance(dateInput);
+                if (datePickerInstance) {
+                    const todayDateObj = new Date(laToday + 'T00:00:00');
+                    datePickerInstance.setDate(todayDateObj);
+                    dateInput.value = laToday;
+                } else {
+                    dateInput.value = laToday;
+                }
+                
+                setDefaultDates(laToday);
+                renderChickens(laToday);
                 renderSummary();
             }
-        });
+        })
+        .catch(error => console.error('Error syncing data:', error));
+    }
+
+    // Initial sync
+    syncData();
+
+    // Re-sync when page is revisited or tab is brought back from background/sleep
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            syncData();
+        }
+    });
+
+    window.addEventListener('pageshow', function() {
+        syncData();
+    });
 
     function renderChickens(date) {
         allChickens.forEach(chickenName => {
