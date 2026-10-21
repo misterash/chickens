@@ -1,2 +1,4 @@
 /uv.lock
 /eggs.db
+__pycache__/
+*.pyc

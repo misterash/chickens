@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 from datetime import datetime
 import pytz
 import os
@@ -74,6 +74,11 @@ def index():
 @app.route('/archive')
 def archive_page():
     return render_template('archive.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/update', methods=['POST'])
 def update():
@@ -158,31 +163,42 @@ def get_chickens():
 @app.route('/add_chicken', methods=['POST'])
 def add_chicken():
     data = request.get_json()
-    chicken_name = data.get('chicken_name')
+    if not data:
+        return jsonify(success=False, message='Invalid request data.')
+
+    chicken_name = data.get('chicken_name', '').strip()
     arrival_date = data.get('arrival_date')
     
     if not chicken_name:
         return jsonify(success=False, message='Chicken name cannot be empty.')
     
-    if not arrival_date:
+    if not arrival_date or not arrival_date.strip():
         la_tz = pytz.timezone('America/Los_Angeles')
         arrival_date = datetime.now(la_tz).strftime('%Y-%m-%d')
+    else:
+        arrival_date = arrival_date.strip()
 
     conn = get_db_connection()
     try:
-        conn.execute('INSERT INTO chickens (name, arrival_date, is_active) VALUES (?, ?, 1)', (chicken_name, arrival_date))
-        conn.commit()
-    except sqlite3.IntegrityError:
-        # Check if it was just deactivated
         cursor = conn.cursor()
-        cursor.execute('SELECT is_active FROM chickens WHERE name = ?', (chicken_name,))
-        row = cursor.fetchone()
-        if row and row[0] == 0:
-            conn.execute('UPDATE chickens SET is_active = 1, arrival_date = ?, deactivation_date = NULL WHERE name = ?', (arrival_date, chicken_name))
-            conn.commit()
+        cursor.execute('SELECT id, name, is_active FROM chickens WHERE LOWER(name) = LOWER(?)', (chicken_name,))
+        existing = cursor.fetchone()
+        if existing:
+            if existing['is_active'] == 0:
+                conn.execute(
+                    'UPDATE chickens SET is_active = 1, arrival_date = ?, deactivation_date = NULL WHERE id = ?',
+                    (arrival_date, existing['id'])
+                )
+                conn.commit()
+            else:
+                conn.close()
+                return jsonify(success=False, message=f"Chicken '{existing['name']}' already exists.")
         else:
-            conn.close()
-            return jsonify(success=False, message='Chicken already exists.')
+            conn.execute('INSERT INTO chickens (name, arrival_date, is_active) VALUES (?, ?, 1)', (chicken_name, arrival_date))
+            conn.commit()
+    except Exception as e:
+        conn.close()
+        return jsonify(success=False, message=str(e))
     
     chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
     conn.close()

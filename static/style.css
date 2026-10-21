@@ -184,8 +184,8 @@ table thead th {
     max-height: 85%;
 }
 
-#editDatesModal {
-    min-height: 500px;
+#editDatesModal, #addChickenModal {
+    min-height: 400px;
     overflow-y: visible;
 }
 
@@ -193,8 +193,9 @@ table thead th {
 @media only screen and (max-width: 600px) {
     .brand-logo { font-size: 1.8rem !important; }
     .card-panel { padding: 16px; border-radius: 16px; }
-    #archive-table { font-size: 14px; }
-    #archive-table th, #archive-table td {
+    #archive-table, #summary-table { font-size: 14px; }
+    #archive-table th, #archive-table td,
+    #summary-table th, #summary-table td {
         padding: 12px 6px;
     }
 }
@@ -276,7 +277,8 @@ body.dark-mode #confirmDeleteBtn {
     color: #fff !important;
 }
 
-body.dark-mode #saveDatesBtn {
+body.dark-mode #saveDatesBtn,
+body.dark-mode #confirmAddChickenBtn {
     background-color: var(--primary-color) !important;
     color: #fff !important;
 }
@@ -317,4 +319,23 @@ body.dark-mode #saveDatesBtn {
     .switch label {
         margin-right: 10px;
     }
+}
+
+/* Chart Section */
+#chart-section {
+    padding: 10px 0;
+}
+
+#chart-grouping-badge {
+    background-color: var(--primary-color) !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 2px 10px !important;
+    letter-spacing: 0.5px;
+}
+
+body.dark-mode #chart-grouping-badge {
+    background-color: #3d5a37 !important;
+    color: #e0e0e0 !important;
 }

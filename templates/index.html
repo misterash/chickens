@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Egg Tracker</title>
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- Google Fonts -->
@@ -60,7 +64,19 @@
                     <label for="end-date">End Date</label>
                 </div>
             </div>
-            <table id="summary-table" class="striped responsive-table">
+
+            <!-- Egg Production Chart -->
+            <div id="chart-section" style="margin: 15px 0 30px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; font-size: 1.1rem; color: var(--text-color);">Flock Production</span>
+                    <span id="chart-grouping-badge" class="badge" style="margin: 0; background-color: var(--primary-color); color: #fff; font-size: 0.8rem;">Daily</span>
+                </div>
+                <div class="chart-wrapper" style="position: relative; height: 240px; width: 100%;">
+                    <canvas id="eggChart"></canvas>
+                </div>
+            </div>
+
+            <table id="summary-table" class="striped">
                 <thead>
                     <tr>
                         <th>Chicken</th>
@@ -77,6 +93,8 @@
     <script>
         window.egg_data = {{ egg_data | tojson }};
     </script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Materialize JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
@@ -90,6 +108,27 @@
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
             <a href="#!" id="confirmDeleteBtn" class="modal-close waves-effect waves-red btn-flat">Retire</a>
+        </div>
+    </div>
+
+    <!-- Add Chicken Modal Structure -->
+    <div id="addChickenModal" class="modal">
+        <div class="modal-content">
+            <h4>Add New Chicken 🐔</h4>
+            <div class="row" style="margin-bottom: 0;">
+                <div class="input-field col s12 m6">
+                    <input type="text" id="newChickenName" required autocomplete="off" placeholder="e.g. Henrietta">
+                    <label for="newChickenName" class="active">Chicken Name</label>
+                </div>
+                <div class="input-field col s12 m6">
+                    <input type="text" class="datepicker" id="newChickenArrivalDate" placeholder="YYYY-MM-DD">
+                    <label for="newChickenArrivalDate" class="active">Arrival Date</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-grey btn-flat">Cancel</a>
+            <button type="button" id="confirmAddChickenBtn" class="waves-effect waves-light btn">Add Chicken</button>
         </div>
     </div>
 </body>
