@@ -286,7 +286,7 @@ body.dark-mode #confirmAddChickenBtn {
 /* Condensed Archive Table Styling */
 .status-badge {
     font-size: 0.7rem;
-    padding: 2px 6px;
+    padding: 2px 6px !important;
     border-radius: 4px;
     color: white;
     font-family: 'Quicksand', sans-serif;
@@ -294,6 +294,8 @@ body.dark-mode #confirmAddChickenBtn {
     text-transform: uppercase;
     display: inline-block;
     line-height: 1.2;
+    margin-left: 8px;
+    vertical-align: middle;
 }
 
 .status-badge.green { background-color: var(--meadow-green); }
@@ -339,3 +341,261 @@ body.dark-mode #chart-grouping-badge {
     background-color: #3d5a37 !important;
     color: #e0e0e0 !important;
 }
+
+/* Quick Date Presets */
+.date-presets-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.preset-label {
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-color);
+    opacity: 0.85;
+    margin-right: 4px;
+}
+
+.preset-btn {
+    border: 1px solid rgba(75, 111, 68, 0.3);
+    background: transparent;
+    color: var(--primary-color);
+    border-radius: 16px;
+    padding: 2px 14px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.preset-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .preset-btn {
+    border-color: rgba(129, 199, 132, 0.35);
+    color: var(--primary-color);
+}
+
+body.dark-mode .preset-btn:hover {
+    background: var(--primary-color);
+    color: #1a2421;
+}
+
+/* Chicken Filter Dropdown */
+#chicken-filter-input {
+    font-family: "Shadows Into Light", cursive !important;
+    font-size: 1.3rem !important;
+    cursor: pointer !important;
+    user-select: none;
+}
+
+.chicken-dropdown-menu {
+    min-width: 260px !important;
+    max-width: 320px !important;
+    max-height: 380px !important;
+    border-radius: 16px !important;
+    padding: 10px !important;
+    background-color: var(--card-background) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    overflow-y: auto !important;
+}
+
+body.dark-mode .chicken-dropdown-menu {
+    background-color: var(--card-background) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+}
+
+.dropdown-header-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+body.dark-mode .dropdown-header-actions {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.filter-action-btn {
+    border: none;
+    background: rgba(75, 111, 68, 0.08);
+    color: var(--primary-color);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-action-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+body.dark-mode .filter-action-btn {
+    background: rgba(129, 199, 132, 0.15);
+}
+
+body.dark-mode .filter-action-btn:hover {
+    background: var(--primary-color);
+    color: #1a2421;
+}
+
+.dropdown-section-header {
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-color);
+    opacity: 0.7;
+    padding: 8px 4px 4px 4px;
+}
+
+.chicken-option-item {
+    display: flex !important;
+    align-items: center;
+    padding: 6px 4px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.15s;
+    user-select: none;
+    margin-bottom: 2px;
+}
+
+.chicken-option-item:hover {
+    background-color: rgba(75, 111, 68, 0.06);
+}
+
+body.dark-mode .chicken-option-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.chicken-option-item > span.chicken-name-label {
+    font-family: "Shadows Into Light", cursive !important;
+    font-size: 1.3rem !important;
+    color: var(--text-color) !important;
+    padding-left: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1.4 !important;
+}
+
+.chicken-option-item .status-badge {
+    font-family: 'Quicksand', sans-serif !important;
+    font-size: 0.65rem !important;
+    padding: 2px 6px !important;
+    border-radius: 4px;
+    margin-left: 8px !important;
+    display: inline-block !important;
+    line-height: 1.2 !important;
+}
+
+/* Materialize filled-in checkbox theme alignment */
+[type="checkbox"].filled-in:checked + span:not(.lever):after {
+    border: 2px solid var(--primary-color) !important;
+    background-color: var(--primary-color) !important;
+}
+
+[type="checkbox"].filled-in:checked + span:not(.lever):before {
+    border-right: 2px solid #fff !important;
+    border-bottom: 2px solid #fff !important;
+}
+
+body.dark-mode [type="checkbox"].filled-in:not(:checked) + span:not(.lever):after {
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Chart Header Row & Grouping Buttons */
+.chart-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.chart-title-group {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chart-selection-desc {
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.grouping-btn-group {
+    display: inline-flex;
+    border-radius: 20px;
+    background: rgba(75, 111, 68, 0.08);
+    padding: 3px;
+    gap: 2px;
+}
+
+body.dark-mode .grouping-btn-group {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.grouping-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    border-radius: 16px;
+    padding: 3px 12px;
+    font-family: "Shadows Into Light", cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.75;
+}
+
+.grouping-btn:hover {
+    opacity: 1;
+}
+
+.grouping-btn.active {
+    background: var(--primary-color);
+    color: #fff;
+    opacity: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+body.dark-mode .grouping-btn.active {
+    color: #1a2421;
+}
+
+/* Table Total Row & Empty State */
+#summary-table tfoot tr {
+    font-weight: 700;
+    border-top: 2px solid rgba(75, 111, 68, 0.2);
+}
+
+body.dark-mode #summary-table tfoot tr {
+    border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+#summary-table tfoot td:nth-child(2) {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
