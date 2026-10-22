@@ -5,7 +5,9 @@ This is a simple and fun web application using Flask that allows you to track ho
 ## ✨ Features
 
 - 📝 **Easy Recording**: Log whether each chicken laid an egg on any specific date.
-- 📊 **Summary View**: See at a glance who is the most productive hen!
+- 📈 **Interactive Production Chart**: Filter by individual, active, or retired chickens, select Daily/Weekly/Monthly aggregation, and use 1-click date range presets.
+- 📊 **Summary View**: See egg totals at a glance filtered by chicken and date range.
+- 🏛️ **Flock Archive**: Track lifetime egg totals and bird lifespans with soft-retirement preservation.
 - 🌓 **Dark Mode Support**: Because even chickens like a bit of night-time vibe.
 - 🗄️ **Robust Storage**: Powered by **SQLite** for reliable and fast data management.
 
