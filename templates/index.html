@@ -54,12 +54,39 @@
 
         <div id="summary" class="card-panel">
             <h2 class="center-align">Egg Totals</h2>
-            <div class="row">
-                <div class="input-field col s12 m6">
+
+            <!-- Quick Date Presets -->
+            <div class="date-presets-wrapper">
+                <span class="preset-label">Quick Ranges:</span>
+                <button type="button" class="preset-btn" data-preset="7d">Past 7 Days</button>
+                <button type="button" class="preset-btn" data-preset="30d">Past Month</button>
+                <button type="button" class="preset-btn" data-preset="month">This Month</button>
+                <button type="button" class="preset-btn" data-preset="all">All Time</button>
+            </div>
+
+            <div class="row" style="margin-bottom: 0;">
+                <!-- Chicken Filter Dropdown -->
+                <div class="input-field col s12 m4">
+                    <input type="text" id="chicken-filter-input" class="dropdown-trigger chicken-filter-input" data-target="chicken-filter-dropdown" readonly="readonly" value="All Chickens" style="cursor: pointer;">
+                    <label for="chicken-filter-input" class="active">Chickens</label>
+                    <svg class="caret" height="24" viewBox="0 0 24 24" width="24" style="position: absolute; right: 10px; top: 12px; pointer-events: none; fill: var(--text-color); opacity: 0.6;"><path d="M7 10l5 5 5-5z"></path></svg>
+                    <div id="chicken-filter-dropdown" class="dropdown-content chicken-dropdown-menu">
+                        <div class="dropdown-header-actions">
+                            <button type="button" id="btn-select-all" class="filter-action-btn">All</button>
+                            <button type="button" id="btn-select-active" class="filter-action-btn">Active</button>
+                            <button type="button" id="btn-select-none" class="filter-action-btn">Clear</button>
+                        </div>
+                        <div id="chicken-checkbox-list" class="chicken-options-container">
+                            <!-- Checkboxes inserted dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-field col s6 m4">
                     <input type="text" class="datepicker" id="start-date">
                     <label for="start-date">Start Date</label>
                 </div>
-                <div class="input-field col s12 m6">
+                <div class="input-field col s6 m4">
                     <input type="text" class="datepicker" id="end-date">
                     <label for="end-date">End Date</label>
                 </div>
@@ -67,11 +94,19 @@
 
             <!-- Egg Production Chart -->
             <div id="chart-section" style="margin: 15px 0 30px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: 600; font-size: 1.1rem; color: var(--text-color);">Flock Production</span>
-                    <span id="chart-grouping-badge" class="badge" style="margin: 0; background-color: var(--primary-color); color: #fff; font-size: 0.8rem;">Daily</span>
+                <div class="chart-header-row">
+                    <div class="chart-title-group">
+                        <span style="font-weight: 600; font-size: 1.15rem; color: var(--text-color);">Egg Production</span>
+                        <span id="chart-selection-desc" class="chart-selection-desc"></span>
+                    </div>
+                    <div class="grouping-btn-group" role="group" aria-label="Group by interval">
+                        <button type="button" class="grouping-btn active" data-grouping="auto">Auto</button>
+                        <button type="button" class="grouping-btn" data-grouping="daily">Daily</button>
+                        <button type="button" class="grouping-btn" data-grouping="weekly">Weekly</button>
+                        <button type="button" class="grouping-btn" data-grouping="monthly">Monthly</button>
+                    </div>
                 </div>
-                <div class="chart-wrapper" style="position: relative; height: 240px; width: 100%;">
+                <div class="chart-wrapper" style="position: relative; height: 250px; width: 100%;">
                     <canvas id="eggChart"></canvas>
                 </div>
             </div>
@@ -86,12 +121,16 @@
                 <tbody>
                     <!-- Data will be inserted here by JavaScript -->
                 </tbody>
+                <tfoot id="summary-table-foot">
+                    <!-- Total row inserted here by JavaScript -->
+                </tfoot>
             </table>
         </div>
     </div>
 
     <script>
         window.egg_data = {{ egg_data | tojson }};
+        window.all_chickens = {{ all_chickens | tojson if all_chickens is defined else '[]' }};
     </script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -10,6 +10,7 @@ A simple Flask-based web application for tracking egg production of individual c
 - **Persistence**: Data is stored locally in `eggs.db` using SQLite.
 - **Key Features**:
     - **Active Tracking**: Toggle egg production for each chicken per date on the main dashboard.
+    - **Production Chart & Analytics**: Filter chart and summary by individual, active, or retired chickens with Daily, Weekly, or Monthly aggregation and quick date presets.
     - **Flock Archive**: A dedicated page for viewing all chickens (past and present) with lifetime statistics.
     - **Soft-Deletion (Retirement)**: Chickens are "retired" rather than deleted, preserving all their historical production data.
     - **Lifespan Tracking**: Record arrival and departure dates for every bird.
@@ -66,8 +67,8 @@ A simple Flask-based web application for tracking egg production of individual c
     - `GET /`: Serves the main tracker dashboard.
     - `GET /archive`: Serves the Flock Archive page.
     - `POST /update`: Updates egg data for a specific date and chicken.
-    - `GET /data`: Returns the full egg data JSON for active chickens.
-    - `GET /get_chickens`: Returns the list of currently active chickens.
+    - `GET /data`: Returns the egg data JSON along with active and all-flock chicken lists.
+    - `GET /get_chickens`: Returns active and all-flock chicken lists.
     - `GET /get_archive`: Returns comprehensive statistics for all chickens.
     - `POST /add_chicken`: Adds a new chicken (requires `chicken_name`, optional `arrival_date`).
     - `POST /remove_chicken`: Retires a chicken by setting `is_active = 0` and recording a deactivation date.

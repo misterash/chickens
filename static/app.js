@@ -45,7 +45,240 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const chickensDiv = document.getElementById('chickens');
-    let allChickens = [];
+    let activeChickens = [];
+    let allFlockChickens = (window.all_chickens && window.all_chickens.length) ? window.all_chickens : [];
+    let selectedChickens = new Set();
+    let currentGrouping = 'auto'; // 'auto' | 'daily' | 'weekly' | 'monthly'
+
+    // Initialize chicken selection from window.all_chickens if available
+    if (allFlockChickens.length > 0) {
+        activeChickens = allFlockChickens.filter(c => c.is_active).map(c => c.name);
+        activeChickens.forEach(n => selectedChickens.add(n));
+        updateChickenFilterDropdown();
+    }
+
+    // Initialize Materialize Dropdown for chicken filtering
+    const filterTriggerEl = document.getElementById('chicken-filter-input');
+    if (filterTriggerEl) {
+        M.Dropdown.init(filterTriggerEl, {
+            closeOnClick: false,
+            constrainWidth: false,
+            coverTrigger: false,
+            alignment: 'left',
+            autoFocus: false
+        });
+    }
+
+    // Dropdown Action Buttons
+    const btnAll = document.getElementById('btn-select-all');
+    if (btnAll) {
+        btnAll.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            allFlockChickens.forEach(c => selectedChickens.add(c.name));
+            syncDropdownCheckboxes();
+            updateChickenFilterSummaryText();
+            renderSummary();
+        });
+    }
+
+    const btnActive = document.getElementById('btn-select-active');
+    if (btnActive) {
+        btnActive.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            selectedChickens.clear();
+            allFlockChickens.filter(c => c.is_active).forEach(c => selectedChickens.add(c.name));
+            syncDropdownCheckboxes();
+            updateChickenFilterSummaryText();
+            renderSummary();
+        });
+    }
+
+    const btnNone = document.getElementById('btn-select-none');
+    if (btnNone) {
+        btnNone.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            selectedChickens.clear();
+            syncDropdownCheckboxes();
+            updateChickenFilterSummaryText();
+            renderSummary();
+        });
+    }
+
+    // Quick Date Presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            applyDatePreset(this.dataset.preset);
+        });
+    });
+
+    // Grouping Toggle
+    document.querySelectorAll('.grouping-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.grouping-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentGrouping = this.dataset.grouping;
+            const startInput = document.getElementById('start-date');
+            const endInput = document.getElementById('end-date');
+            renderEggChart(startInput ? startInput.value : '', endInput ? endInput.value : '');
+        });
+    });
+
+    function applyDatePreset(presetKey) {
+        const laToday = getLAToday();
+        const today = new Date(laToday + 'T00:00:00');
+        let start = new Date(today);
+        let end = new Date(today);
+
+        if (presetKey === '7d') {
+            start.setDate(today.getDate() - 6);
+        } else if (presetKey === '30d') {
+            start.setDate(today.getDate() - 29);
+        } else if (presetKey === 'month') {
+            start = new Date(today.getFullYear(), today.getMonth(), 1);
+        } else if (presetKey === 'all') {
+            let earliest = laToday;
+            if (window.egg_data) {
+                const dates = Object.keys(window.egg_data).sort();
+                if (dates.length > 0 && dates[0] < earliest) {
+                    earliest = dates[0];
+                }
+            }
+            start = new Date(earliest + 'T00:00:00');
+        }
+
+        const yS = start.getFullYear();
+        const mS = String(start.getMonth() + 1).padStart(2, '0');
+        const dS = String(start.getDate()).padStart(2, '0');
+        const startStr = `${yS}-${mS}-${dS}`;
+
+        const yE = end.getFullYear();
+        const mE = String(end.getMonth() + 1).padStart(2, '0');
+        const dE = String(end.getDate()).padStart(2, '0');
+        const endStr = `${yE}-${mE}-${dE}`;
+
+        const startInput = document.getElementById('start-date');
+        const endInput = document.getElementById('end-date');
+        if (startInput) {
+            startInput.value = startStr;
+            const sp = M.Datepicker.getInstance(startInput);
+            if (sp) sp.setDate(start);
+        }
+        if (endInput) {
+            endInput.value = endStr;
+            const ep = M.Datepicker.getInstance(endInput);
+            if (ep) ep.setDate(end);
+        }
+        M.updateTextFields();
+        renderSummary();
+    }
+
+    function updateChickenFilterDropdown() {
+        const listContainer = document.getElementById('chicken-checkbox-list');
+        if (!listContainer) return;
+        listContainer.innerHTML = '';
+
+        if (selectedChickens.size === 0 && allFlockChickens.length > 0) {
+            const activeNames = allFlockChickens.filter(c => c.is_active).map(c => c.name);
+            if (activeNames.length > 0) {
+                activeNames.forEach(n => selectedChickens.add(n));
+            } else {
+                allFlockChickens.forEach(c => selectedChickens.add(c.name));
+            }
+        }
+
+        const active = allFlockChickens.filter(c => c.is_active);
+        const retired = allFlockChickens.filter(c => !c.is_active);
+
+        function createOption(c) {
+            const label = document.createElement('label');
+            label.className = 'chicken-option-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'filled-in';
+            checkbox.value = c.name;
+            checkbox.checked = selectedChickens.has(c.name);
+
+            const span = document.createElement('span');
+            span.className = 'chicken-name-label';
+            if (!c.is_active) {
+                span.innerHTML = `${c.name}<span class="status-badge grey">Retired</span>`;
+            } else {
+                span.textContent = c.name;
+            }
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                if (this.checked) {
+                    selectedChickens.add(c.name);
+                } else {
+                    selectedChickens.delete(c.name);
+                }
+                updateChickenFilterSummaryText();
+                renderSummary();
+            });
+
+            return label;
+        }
+
+        active.forEach(c => listContainer.appendChild(createOption(c)));
+
+        if (retired.length > 0) {
+            if (active.length > 0) {
+                const header = document.createElement('div');
+                header.className = 'dropdown-section-header';
+                header.textContent = 'Retired Chickens';
+                listContainer.appendChild(header);
+            }
+            retired.forEach(c => listContainer.appendChild(createOption(c)));
+        }
+
+        updateChickenFilterSummaryText();
+    }
+
+    function syncDropdownCheckboxes() {
+        const listContainer = document.getElementById('chicken-checkbox-list');
+        if (!listContainer) return;
+        const inputs = listContainer.querySelectorAll('input[type="checkbox"]');
+        inputs.forEach(input => {
+            input.checked = selectedChickens.has(input.value);
+        });
+    }
+
+    function updateChickenFilterSummaryText() {
+        const inputEl = document.getElementById('chicken-filter-input');
+        if (!inputEl) return;
+
+        const totalCount = allFlockChickens.length;
+        const activeCount = allFlockChickens.filter(c => c.is_active).length;
+        const selCount = selectedChickens.size;
+
+        if (selCount === 0) {
+            inputEl.value = 'None Selected';
+        } else if (selCount === totalCount) {
+            inputEl.value = `All Chickens (${totalCount})`;
+        } else if (selCount === 1) {
+            const singleName = Array.from(selectedChickens)[0];
+            const bird = allFlockChickens.find(c => c.name === singleName);
+            if (bird && !bird.is_active) {
+                inputEl.value = `${singleName} (Retired)`;
+            } else {
+                inputEl.value = singleName;
+            }
+        } else if (selCount === activeCount && activeCount > 0 && allFlockChickens.filter(c => c.is_active).every(c => selectedChickens.has(c.name))) {
+            inputEl.value = `All Active (${activeCount})`;
+        } else {
+            inputEl.value = `${selCount} Selected`;
+        }
+    }
 
     // Add Chicken modal initialization
     const addChickenModalEl = document.getElementById('addChickenModal');
@@ -196,7 +429,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                allChickens = data.chickens;
+                activeChickens = data.chickens;
+                if (data.all_chickens) {
+                    allFlockChickens = data.all_chickens;
+                }
+                selectedChickens.add(name);
                 if (addChickenModalInstance) {
                     addChickenModalInstance.close();
                 }
@@ -206,7 +443,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(r => r.json())
                     .then(eggData => {
                         window.egg_data = eggData;
-                        renderChickenCards(allChickens);
+                        renderChickenCards(activeChickens);
+                        updateChickenFilterDropdown();
                         renderChickens(currentDate);
                         renderSummary();
                         M.toast({html: 'Added ' + name + ' to the flock! 🐔', classes: 'green darken-1'});
@@ -230,10 +468,17 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                allChickens = data.chickens;
+                activeChickens = data.chickens;
+                if (data.all_chickens) {
+                    allFlockChickens = data.all_chickens;
+                } else {
+                    const bird = allFlockChickens.find(c => c.name === name);
+                    if (bird) bird.is_active = false;
+                }
                 const dateInput = document.getElementById('date-picker');
                 const currentDate = dateInput ? dateInput.value : getLAToday();
-                renderChickenCards(allChickens);
+                renderChickenCards(activeChickens);
+                updateChickenFilterDropdown();
                 renderChickens(currentDate);
                 renderSummary();
                 M.toast({html: 'Chicken retired.', classes: 'green darken-1'});
@@ -261,10 +506,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ])
         .then(([chickensData, eggData]) => {
             if (chickensData.success) {
-                allChickens = chickensData.chickens;
+                activeChickens = chickensData.chickens;
+                allFlockChickens = chickensData.all_chickens || eggData.all_chickens || activeChickens.map(n => ({ name: n, is_active: true }));
                 window.egg_data = eggData;
                 
-                renderChickenCards(allChickens);
+                renderChickenCards(activeChickens);
+                updateChickenFilterDropdown();
                 
                 const datePickerInstance = M.Datepicker.getInstance(dateInput);
                 if (datePickerInstance) {
@@ -298,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function renderChickens(date) {
-        allChickens.forEach(chickenName => {
+        activeChickens.forEach(chickenName => {
             const input = chickensDiv.querySelector('input[data-chicken-name="' + chickenName + '"]');
             if (input) {
                 const isChecked = (window.egg_data && window.egg_data[date] && window.egg_data[date][chickenName]);
@@ -326,8 +573,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const summaryTableBody = document.querySelector('#summary-table tbody');
+        const summaryTableFoot = document.getElementById('summary-table-foot');
         if (!summaryTableBody) return;
         summaryTableBody.innerHTML = '';
+        if (summaryTableFoot) summaryTableFoot.innerHTML = '';
 
         if (startDate && endDate && startDate > endDate) {
             const row = summaryTableBody.insertRow();
@@ -340,14 +589,36 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        if (selectedChickens.size === 0) {
+            const row = summaryTableBody.insertRow();
+            const cell = row.insertCell(0);
+            cell.colSpan = 2;
+            cell.className = 'center-align grey-text';
+            cell.style.padding = '20px';
+            cell.textContent = 'No chickens selected. Check at least one chicken in the filter above.';
+            renderEggChart(startDate, endDate);
+            return;
+        }
+
+        // Filter flock chickens to only those in selectedChickens
+        const displayedChickens = allFlockChickens.filter(c => selectedChickens.has(c.name));
+        
+        // Sort: active first, then alphabetical
+        displayedChickens.sort((a, b) => {
+            if (a.is_active !== b.is_active) {
+                return a.is_active ? -1 : 1;
+            }
+            return a.name.localeCompare(b.name);
+        });
+
         const eggCounts = {};
-        allChickens.forEach(c => eggCounts[c] = 0);
+        displayedChickens.forEach(c => eggCounts[c.name] = 0);
 
         if (window.egg_data && startDate && endDate) {
             for (const dateStr in window.egg_data) {
                 if (dateStr >= startDate && dateStr <= endDate) {
                     for (const chickenName in window.egg_data[dateStr]) {
-                        if (allChickens.includes(chickenName) && window.egg_data[dateStr][chickenName]) {
+                        if (selectedChickens.has(chickenName) && window.egg_data[dateStr][chickenName]) {
                             eggCounts[chickenName] = (eggCounts[chickenName] || 0) + 1;
                         }
                     }
@@ -355,11 +626,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        allChickens.forEach(chickenName => {
+        let grandTotal = 0;
+        displayedChickens.forEach(chicken => {
+            const count = eggCounts[chicken.name] || 0;
+            grandTotal += count;
             const row = summaryTableBody.insertRow();
-            row.insertCell(0).textContent = chickenName;
-            row.insertCell(1).textContent = eggCounts[chickenName] || 0;
+            const nameCell = row.insertCell(0);
+            if (!chicken.is_active) {
+                nameCell.innerHTML = `${chicken.name}<span class="status-badge grey">Retired</span>`;
+            } else {
+                nameCell.textContent = chicken.name;
+            }
+            row.insertCell(1).textContent = count;
         });
+
+        if (summaryTableFoot && displayedChickens.length > 1) {
+            const footRow = summaryTableFoot.insertRow();
+            const labelCell = footRow.insertCell(0);
+            labelCell.textContent = 'Total';
+            labelCell.style.fontWeight = '700';
+            const totalCell = footRow.insertCell(1);
+            totalCell.textContent = grandTotal;
+            totalCell.style.fontWeight = '700';
+        }
 
         // Update Egg Production Chart
         renderEggChart(startDate, endDate);
@@ -378,15 +667,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getChartData(startDate, endDate) {
         if (!startDate || !endDate) {
-            return { labels: [], data: [], grouping: 'Daily' };
+            return { labels: [], data: [], effectiveGrouping: 'Daily' };
         }
         if (startDate > endDate) {
-            return { labels: [], data: [], grouping: 'Invalid Range' };
+            return { labels: [], data: [], effectiveGrouping: 'Invalid Range' };
         }
 
         const start = new Date(startDate + 'T00:00:00');
         const end = new Date(endDate + 'T00:00:00');
         const dayDiff = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+        let grouping = currentGrouping;
+        if (grouping === 'auto') {
+            if (dayDiff <= 31) grouping = 'daily';
+            else if (dayDiff <= 120) grouping = 'weekly';
+            else grouping = 'monthly';
+        }
+
+        const effectiveGrouping = grouping.charAt(0).toUpperCase() + grouping.slice(1);
 
         // Daily map filled with 0
         const dailyMap = {};
@@ -399,12 +697,12 @@ document.addEventListener('DOMContentLoaded', function() {
             curr.setDate(curr.getDate() + 1);
         }
 
-        if (window.egg_data) {
+        if (window.egg_data && selectedChickens.size > 0) {
             for (const dateStr in window.egg_data) {
                 if (dailyMap.hasOwnProperty(dateStr)) {
                     let daySum = 0;
-                    for (const chickenName in window.egg_data[dateStr]) {
-                        if (allChickens.includes(chickenName) && window.egg_data[dateStr][chickenName]) {
+                    for (const chickenName of selectedChickens) {
+                        if (window.egg_data[dateStr][chickenName]) {
                             daySum++;
                         }
                     }
@@ -415,15 +713,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const sortedDates = Object.keys(dailyMap).sort();
 
-        if (dayDiff <= 31) {
+        if (grouping === 'daily') {
             const labels = sortedDates.map(dStr => {
                 const dt = new Date(dStr + 'T00:00:00');
                 return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
             });
             const data = sortedDates.map(dStr => dailyMap[dStr]);
-            return { labels, data, grouping: 'Daily' };
-        } else if (dayDiff <= 120) {
-            // Group into 7-day chunks
+            return { labels, data, effectiveGrouping };
+        } else if (grouping === 'weekly') {
             const labels = [];
             const data = [];
             for (let i = 0; i < sortedDates.length; i += 7) {
@@ -443,9 +740,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 labels.push(label);
                 data.push(chunkSum);
             }
-            return { labels, data, grouping: 'Weekly' };
+            return { labels, data, effectiveGrouping };
         } else {
-            // Group into months
+            // monthly
             const monthMap = {};
             sortedDates.forEach(dStr => {
                 const mKey = dStr.substring(0, 7);
@@ -458,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return dt.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
             });
             const data = sortedMonths.map(mStr => monthMap[mStr]);
-            return { labels, data, grouping: 'Monthly' };
+            return { labels, data, effectiveGrouping };
         }
     }
 
@@ -466,10 +763,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const canvas = document.getElementById('eggChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        const { labels, data, grouping } = getChartData(startDate, endDate);
-        const badge = document.getElementById('chart-grouping-badge');
-        if (badge) {
-            badge.textContent = grouping;
+        const { labels, data, effectiveGrouping } = getChartData(startDate, endDate);
+        
+        const subtitleEl = document.getElementById('chart-selection-desc');
+        if (subtitleEl) {
+            if (selectedChickens.size === 0) {
+                subtitleEl.textContent = '• No chickens selected';
+            } else if (selectedChickens.size === 1) {
+                const singleChicken = Array.from(selectedChickens)[0];
+                subtitleEl.textContent = `• ${singleChicken} (${effectiveGrouping})`;
+            } else if (allFlockChickens.length > 0 && selectedChickens.size === allFlockChickens.length) {
+                subtitleEl.textContent = `• All flock (${effectiveGrouping})`;
+            } else {
+                subtitleEl.textContent = `• ${selectedChickens.size} chickens (${effectiveGrouping})`;
+            }
+        }
+
+        let datasetLabel = 'Eggs Laid';
+        if (selectedChickens.size === 1) {
+            const singleChicken = Array.from(selectedChickens)[0];
+            datasetLabel = `${singleChicken}'s Eggs`;
         }
 
         const isDarkMode = document.body.classList.contains('dark-mode');
@@ -477,6 +790,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (eggChart) {
             eggChart.data.labels = labels;
+            eggChart.data.datasets[0].label = datasetLabel;
             eggChart.data.datasets[0].data = data;
             eggChart.data.datasets[0].backgroundColor = theme.bar;
             eggChart.data.datasets[0].hoverBackgroundColor = theme.hover;
@@ -493,7 +807,7 @@ document.addEventListener('DOMContentLoaded', function() {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Eggs Laid',
+                    label: datasetLabel,
                     data: data,
                     backgroundColor: theme.bar,
                     hoverBackgroundColor: theme.hover,
@@ -515,6 +829,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         callbacks: {
                             label: function(context) {
                                 const val = context.raw;
+                                if (selectedChickens.size === 1) {
+                                    const name = Array.from(selectedChickens)[0];
+                                    return ` ${name}: ${val} egg${val === 1 ? '' : 's'}`;
+                                }
                                 return ` ${val} egg${val === 1 ? '' : 's'}`;
                             }
                         }
@@ -604,6 +922,11 @@ function updateEggData(date, chicken, laid_egg) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) window.egg_data = data.egg_data;
+        if (data.success) {
+            window.egg_data = data.egg_data;
+            if (data.all_chickens) {
+                window.all_chickens = data.all_chickens;
+            }
+        }
     });
 }

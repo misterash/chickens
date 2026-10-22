@@ -48,28 +48,35 @@ def init_db():
 
 init_db()
 
+def get_chicken_lists(conn):
+    active = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1 ORDER BY name ASC').fetchall()]
+    all_chickens = [{'name': r['name'], 'is_active': bool(r['is_active'])} for r in conn.execute('SELECT name, is_active FROM chickens ORDER BY is_active DESC, name ASC').fetchall()]
+    return active, all_chickens
+
+def get_all_egg_data(conn):
+    production = conn.execute('''
+        SELECT ep.date, c.name as chicken_name, ep.laid
+        FROM egg_production ep
+        JOIN chickens c ON ep.chicken_id = c.id
+    ''').fetchall()
+    egg_data = {}
+    for r in production:
+        d = r['date']
+        if d not in egg_data:
+            egg_data[d] = {}
+        egg_data[d][r['chicken_name']] = bool(r['laid'])
+    return egg_data
+
 @app.route('/')
 def index():
     la_tz = pytz.timezone('America/Los_Angeles')
     today = datetime.now(la_tz).strftime('%Y-%m-%d')
     
     conn = get_db_connection()
-    # Fetch egg data only for active chickens (or chickens that were active on that date)
-    production = conn.execute('''
-        SELECT ep.date, c.name as chicken_name, ep.laid
-        FROM egg_production ep
-        JOIN chickens c ON ep.chicken_id = c.id
-    ''').fetchall()
-    
-    egg_data = {}
-    for row in production:
-        date = row['date']
-        if date not in egg_data:
-            egg_data[date] = {}
-        egg_data[date][row['chicken_name']] = bool(row['laid'])
-    
+    egg_data = get_all_egg_data(conn)
+    _, all_chickens = get_chicken_lists(conn)
     conn.close()
-    return render_template('index.html', today=today, egg_data=egg_data)
+    return render_template('index.html', today=today, egg_data=egg_data, all_chickens=all_chickens)
 
 @app.route('/archive')
 def archive_page():
@@ -108,57 +115,30 @@ def update():
     
     conn.commit()
     
-    # Fetch updated data for active chickens
-    production = conn.execute('''
-        SELECT ep.date, c.name as chicken_name, ep.laid
-        FROM egg_production ep
-        JOIN chickens c ON ep.chicken_id = c.id
-        WHERE c.is_active = 1
-    ''').fetchall()
-    
-    egg_data = {}
-    for r in production:
-        d = r['date']
-        if d not in egg_data:
-            egg_data[d] = {}
-        egg_data[d][r['chicken_name']] = bool(r['laid'])
-        
-    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
+    egg_data = get_all_egg_data(conn)
+    active_chickens, all_chickens = get_chicken_lists(conn)
     conn.close()
 
-    return jsonify(success=True, egg_data=egg_data, chickens=chickens)
+    return jsonify(success=True, egg_data=egg_data, chickens=active_chickens, all_chickens=all_chickens)
 
 @app.route('/data')
 def get_data():
     conn = get_db_connection()
-    
-    production = conn.execute('''
-        SELECT ep.date, c.name as chicken_name, ep.laid
-        FROM egg_production ep
-        JOIN chickens c ON ep.chicken_id = c.id
-        WHERE c.is_active = 1
-    ''').fetchall()
-    
-    egg_data = {}
-    for row in production:
-        date = row['date']
-        if date not in egg_data:
-            egg_data[date] = {}
-        egg_data[date][row['chicken_name']] = bool(row['laid'])
-        
-    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
+    egg_data = get_all_egg_data(conn)
+    active_chickens, all_chickens = get_chicken_lists(conn)
     conn.close()
     
     full_data = egg_data
-    full_data['chickens'] = chickens
+    full_data['chickens'] = active_chickens
+    full_data['all_chickens'] = all_chickens
     return jsonify(full_data)
 
 @app.route('/get_chickens')
 def get_chickens():
     conn = get_db_connection()
-    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
+    active_chickens, all_chickens = get_chicken_lists(conn)
     conn.close()
-    return jsonify(success=True, chickens=chickens)
+    return jsonify(success=True, chickens=active_chickens, all_chickens=all_chickens)
 
 @app.route('/add_chicken', methods=['POST'])
 def add_chicken():
@@ -200,10 +180,10 @@ def add_chicken():
         conn.close()
         return jsonify(success=False, message=str(e))
     
-    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
+    active_chickens, all_chickens = get_chicken_lists(conn)
     conn.close()
 
-    return jsonify(success=True, chickens=chickens)
+    return jsonify(success=True, chickens=active_chickens, all_chickens=all_chickens)
 
 @app.route('/remove_chicken', methods=['POST'])
 def remove_chicken():
@@ -218,10 +198,10 @@ def remove_chicken():
     conn.execute('UPDATE chickens SET is_active = 0, deactivation_date = ? WHERE name = ?', (today, chicken_name))
     conn.commit()
     
-    chickens = [r['name'] for r in conn.execute('SELECT name FROM chickens WHERE is_active = 1').fetchall()]
+    active_chickens, all_chickens = get_chicken_lists(conn)
     conn.close()
 
-    return jsonify(success=True, chickens=chickens)
+    return jsonify(success=True, chickens=active_chickens, all_chickens=all_chickens)
 
 @app.route('/get_archive')
 def get_archive():
